@@ -1,0 +1,86 @@
+/*
+* 本文档由swagger客户端生成工具自动生成
+* 使用axios作为ajax客户端库
+* 作者： Jover
+*/
+import axios from 'axios';
+
+const http = axios.create({
+    baseURL: '[:=this.$config.baseUrl:]'
+});
+
+/**
+* swagger 地址：[:=$config.swaggerUrl:]
+* 本实例由axios创建 axios文档地址 https://github.com/axios/axios
+*/
+const apis = {
+    $http: http,
+[:
+for (const [groupName, groupInfo] of Object.entries(this.current)) {
+:]
+    [:=groupName:]: {
+[:
+    for (const [functionName, functionInfo] of Object.entries(groupInfo)) {
+
+        const [method, path, define] = functionInfo;
+        const tplPath = path.replace(new RegExp('\\{', 'g'), '${');
+        const parameters = define.parameters || [];
+        const fn = functionName[0].toLowerCase() + functionName.substring(1);
+        /* 参数名重复处理 */
+        const pathParams = parameters.filter(p => p.in === 'path');
+        const queryParams = parameters.filter(p => p.in === 'query');
+        const bodyParams = parameters.filter(p => p.in === 'body');
+        /** 注释处理
+        * const queryParams = parameters.filter(p => p.in === 'query').reduce((total, current) => {
+        *     const argName = parameters.filter(p => p.name === current.name).length > 1 ? current.name + 'InQuery' : current.name;
+        *     total[argName] = current;
+        *     return total;
+        * }, {});
+        * const bodyParams = parameters.filter(p => p.in === 'body').reduce((total, current) => {
+        *     const argName = parameters.filter(p => p.name === current.name).length > 1 ? current.name + 'InBody' : current.name;
+        *     total[argName] = current;
+        *     return total;
+        * }, {});
+        */
+
+        const args = [ ...pathParams.map(p => p.name) ];
+        if (queryParams.length) {
+            args.push('$query');
+        }
+        if (bodyParams.length) {
+            args.push('$body');
+        }
+:]
+        /** 
+        * [:=define.summary || '':][: if (pathParams.length) {:]
+        * [:=pathParams.map(p => `@param {${this.$helpers.resolveType(p)}} ${p.name} ${p.format || ''} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        * ') :][:}:]
+[:if(queryParams.length) {:]        * @param {*} $query
+        *    [:= queryParams.map(p=> `${p.name}: ${this.$helpers.resolveType(p)} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        *    '):]
+[:}:] [:if(bodyParams.length) {:]        * @param {*} $body
+        *    [:= bodyParams.map(p=> `${p.name}: ${this.$helpers.resolveType(p)} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        *    '):]
+[:}:]        * @returns {[:= this.$helpers.resolveType(define.responses[200]) :]} [:= this.$helpers.resolveType(define.responses[200]) :]
+        */
+        async [:=fn:]([:=args.join(', '):]) {
+            const path = `[:=tplPath:]`;
+            const res = await http({
+                method: [:=method:],
+                url: path[:if (queryParams.length) {:],
+                params: $query[:} if (bodyParams.length>0) {:],
+                data: $body[:}:]
+            });
+            return res.data;
+        },
+[:
+    }
+:]
+    },
+[:
+}
+:]
+}
+
+
+// 注册全局命令空间
+(globa || globaThis || window || this).[:= this.$config.namespace :] = api;
+
+export default api;

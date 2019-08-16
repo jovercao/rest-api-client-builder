@@ -1,7 +1,8 @@
 {
     "swaggerUrl": null,
-    "clientNamespace": "RestApiClient",
-    "modelsNamespace": "ClientModels",
-    "outputDir": "./outputs",
-    "modelsDir": "ClientModels"
+    "namespace": "api",
+    "outputDir": "./restApi",
+    "modelsDir": "models",
+    "lang": "es6",
+    "name": "api"
 }

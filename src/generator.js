@@ -3,63 +3,28 @@ const { tppl } = require('tppl');
 const http = require('axios');
 const fs = require('fs');
 const path = require('path');
+const { URL } = require('url');
+var mkdirp = require('mkdirp');
 
-const config = Object.assign({}, defaultConfig);
+const { tagGroup_operatorIdMethod } = require('./utils/indexesGenerator');
+const langs = require('./langs');
 
-function generate(tplFile, datas, outputPath) {
-    const resolveType = function(schema) {
-        if (schema.type) {
-            if (schema.type === 'array') {
-                return resolveType(schema.items) + '[]';
-            }
-            if (schema.format) {
-                switch (schema.format) {
-                    case 'int32':
-                        return 'int';
-                    case 'int64':
-                        return 'long';
-                    case 'date-time':
-                        return 'DateTime';
-                    default:
-                        return schema.format
-                }
-            }
-            switch (schema.type) {
-                case 'boolean':
-                    return 'bool';
-                default:
-                    return schema.type;
-            }
-        }
-        if (schema.$ref) {
-            return config.modelsNamespace + '.' + schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1);
-        }
-        if (schema.schema) {
-            return resolveType(schema.schema);
-        }
-        throw new Error(`未能转换类型${schema}`);
-    };
-
-    var model = {
-        config,
-        resolveType,
-        ...datas
-        // resolveRefSchema: function($ref,) {
-        //     return $ref.substring(1).split('/').reduce((total, current) => total[current], this.doc)
-        // },
-    };
-    const outputDir = path.resolve(process.cwd(), config.outputDir);
-
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir);
-    }
-
+/**
+ * 
+ * @param {*} tplFile 模板文件
+ * @param {*} context 渲染数据
+ * @param {*} outputPath 输出路径
+ */
+function generate(tplFile, context, outputPath) {
     var apiClientTpl = readFile(tplFile);
     const render = tppl(apiClientTpl);
-    if (!outputPath) {
-        outputPath = path.resolve(outputDir, tplFile.substring(tplFile.lastIndexOf('/') + 1, tplFile.lastIndexOf('.')) + '.cs');
+    const content = render(context);
+    
+    const outputDir = path.dirname(outputPath);
+
+    if (!fs.existsSync(outputDir)) {
+        mkdirp.sync(outputDir);
     }
-    const content = render(model);
     writeFile(outputPath, content);
 }
 
@@ -75,6 +40,7 @@ function writeFile(filePath, data) {
 }
 
 module.exports = async function run(optionsConfig) {
+    const config = Object.assign({}, defaultConfig);
     var cwdConfigPath = path.resolve(process.cwd(), '.restapi.config');
     let cwdConfig, userConfig;
     if (fs.existsSync(cwdConfigPath)) {
@@ -85,37 +51,108 @@ module.exports = async function run(optionsConfig) {
         userConfig = require(userConfigPath);
     }
     Object.assign(config, cwdConfig, userConfig, optionsConfig);
+    if (!config.baseUrl && config.swaggerUrl.startsWith('http')) {
+        config.baseUrl = new URL(config.swaggerUrl).origin;
+    }
+
+    // 语言上下文对象
+    const langSettings = langs[config.lang];
 
     if (!config.swaggerUrl) {
         console.error('ERROR: 未配置swaggerUrl，您也可以在配置文件中添加该项，也可以从参数进行传递');
         return;
     }
+
     try {
-        let doc;
+        let swaggerDoc;
         try {
-            let response = await http.get(config.swaggerUrl);
-            doc = response.data;
+            if (config.swaggerUrl.startsWith('http')) {
+                let response = await http.get(config.swaggerUrl);
+                swaggerDoc = response.data;
+            } else {
+                const absPath = path.resolve(process.cwd(), config.swaggerUrl);
+                swaggerDoc = require(absPath);
+            }
         } catch(ex) {
             console.error(ex);
             return;
         }
 
-        if (typeof doc !== 'object' || !doc.paths) {
+        if (typeof swaggerDoc !== 'object' || !swaggerDoc.paths) {
             console.error('ERROR: 请填写正确的swaggerUrl。');
             return;
         }
 
-        generate('./tpls/ApiClient.tppl', { doc });
-        const modelsDir = path.resolve(process.cwd(), config.outputDir, config.modelsDir);
-        if (!fs.existsSync(modelsDir)) {
-            fs.mkdirSync(modelsDir);
+        const indexes = tagGroup_operatorIdMethod(swaggerDoc);
+
+        // 生成client客户端
+        for (const item of langSettings.client) {
+            // // 多文件输出
+            if (item.multiFile) {
+                for (const group of Object.keys(indexes)) {
+                    // 上下文对象
+                    const context = {
+                        $helpers: langSettings.helpers,
+                        $config: config,
+                        current: indexes[group],
+                        name: group,
+                        doc: swaggerDoc
+                    };
+                    const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', group);
+                    const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
+                    generate(item.tpl || item.tplFile, context, outputPath);
+                }
+            } else {
+                const context = {
+                    $helpers: langSettings.helpers,
+                    $config: config,
+                    current: indexes,
+                    name: config.name,
+                    doc: swaggerDoc
+                };
+                const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', config.name);
+                const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
+                generate(item.tpl || item.tplFile, context, outputPath);
+            }
         }
 
-        for([name, model] of Object.entries(doc.definitions)) {
-            const outputPath = path.resolve(modelsDir, name + '.cs');
-            generate('./tpls/Model.tppl', { doc, model, modelName: name }, outputPath);
+        const modelsDir = path.resolve(process.cwd(), config.outputDir, config.modelsDir || 'models');
+        if (!fs.existsSync(modelsDir)) {
+            mkdirp.sync(modelsDir);
+        }
+
+
+        // 生成client客户端
+        for (const item of langSettings.model) {
+            if (langSettings.model.multiFile) {
+                for([name, model] of Object.entries(swaggerDoc.definitions)) {
+                    // 上下文对象
+                    const context = {
+                        $helpers: langSettings.helpers,
+                        $config: config,
+                        current: model,
+                        name: name,
+                        doc: swaggerDoc
+                    };
+                    const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', name);
+                    const outputPath = path.resolve(process.cwd(), config.outputDir, config.modelsDir, fileName);
+                    generate(item.tpl || item.tplFile, context, outputPath);
+                }
+            } else {
+                // 上下文对象
+                const context = {
+                    $helpers: langSettings.helpers,
+                    $config: config,
+                    current: swaggerDoc.definitions,
+                    name: config.name,
+                    doc: swaggerDoc
+                };
+                const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', context.name);
+                const outputPath = path.resolve(process.cwd(), config.outputDir, config.modelsDir, fileName);
+                generate(item.tpl || item.tplFile, context, outputPath);
+            }
         }
     } catch(ex) {
         console.error(ex);
     }
-}
+};
