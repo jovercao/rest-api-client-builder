@@ -95,8 +95,8 @@ module.exports = async function run(optionsConfig) {
                         $helpers: langSettings.helpers,
                         $config: config,
                         current: indexes[group],
-                        name: group,
-                        doc: swaggerDoc
+                        $name: group,
+                        $doc: swaggerDoc
                     };
                     const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', group);
                     const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
@@ -107,8 +107,8 @@ module.exports = async function run(optionsConfig) {
                     $helpers: langSettings.helpers,
                     $config: config,
                     current: indexes,
-                    name: config.name,
-                    doc: swaggerDoc
+                    $name: config.name,
+                    $doc: swaggerDoc
                 };
                 const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', config.name);
                 const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
@@ -131,8 +131,8 @@ module.exports = async function run(optionsConfig) {
                         $helpers: langSettings.helpers,
                         $config: config,
                         current: model,
-                        name: name,
-                        doc: swaggerDoc
+                        $name: name,
+                        $doc: swaggerDoc
                     };
                     const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', name);
                     const outputPath = path.resolve(process.cwd(), config.outputDir, config.modelsDir, fileName);
@@ -144,8 +144,8 @@ module.exports = async function run(optionsConfig) {
                     $helpers: langSettings.helpers,
                     $config: config,
                     current: swaggerDoc.definitions,
-                    name: config.name,
-                    doc: swaggerDoc
+                    $name: config.name,
+                    $doc: swaggerDoc
                 };
                 const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', context.name);
                 const outputPath = path.resolve(process.cwd(), config.outputDir, config.modelsDir, fileName);

@@ -5,44 +5,44 @@
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace [:= this.config.clientNamespace :]
+namespace [:= this.$config.namespace :]
 {
     /// <summary>
     /// RestSharp 文档地址 https://github.com/restsharp/RestSharp
     /// swagger 地址：[:=config.swaggerUrl:]
     /// </summary> 
-    public class ApiClient
+    public partial class [:=this.$name:]Client
     {
         private RestClient client;
-        public ApiClient(string url)
+        public ApiClient(string url = "[:=this.$config.baseUrl:]")
         {
             client = new RestClient(url);
         }
 
 [:
-for(var [path, pathDefine] of Object.entries(this.doc.paths)) {
-    let methodName = path.substring(path.lastIndexOf('/') + 1);
-    var methods = Object.keys(pathDefine);
-    for (let hm of methods) {
-        const method = pathDefine[hm];
-        const httpMethod = hm[0].toUpperCase() + hm.substring(1);
-        if (methods.length > 1) {
-            methodName = httpMethod + methodName;
-        }
-        let returnType = this.resolveType(method.responses['200']);
+for(const [fn, [ method, path, methodInfo ]] of Object.entries(this.current)) {
+    const methods = Object.keys(pathDefine);
+    let returnType = this.resolveType(method.responses['200']);
+    const parameters = define.parameters || [];
+    /* 参数名重复处理 */
+    const pathParams = parameters.filter(p => p.in === 'path');
+    const queryParams = parameters.filter(p => p.in === 'query');
+    const bodyParams = parameters.filter(p => p.in === 'body');
 :]
         /// <summary>
-        /// [:=method.summary:]
+        /// [:=methodInfo.summary:]
         /// </summary>
-[:=(method.parameters || []).map(p => `        /// <param name="${p.name}">${p.description}</param>`).join('\r\n'):]
-        public [:=returnType:] [:=methodName:]([:= (method.parameters || []).map(parameter => this.resolveType(parameter) + ' ' + parameter.name).join(',') :])
+[:=(pathParams).map(p => `        /// <param name="${p.name}">${p.description}</param>`).join('\r\n'):]
+        public [:=returnType:] [:=fn:]([:= pathParams.map(parameter => this.resolveType(parameter) + ' ' + parameter.name).join(',') :],
+            $query, $body)
         {
-            var request = new RestRequest("[:=path:]", RestSharp.Method.[:=httpMethod.toUpperCase():]);
-            var response = client.[:=httpMethod:](request);
+            var path = $"[:=path:]";
+            var request = new RestRequest(path, RestSharp.Method.[:=method.toUpperCase():]);
+            request.AddJsonObject()
+            var response = client.ExecuteTaskAsync(request);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<[:=returnType:]>(response.Content);
         }
 [:
-    }
 }
 :]
     }

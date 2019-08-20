@@ -62,3 +62,11 @@ exports.resolveTypescriptType = function resolveTypescriptType(schema) {
     return 'void';
     // throw new Error(`未能转换类型${schema}`);
 };
+
+exports.resolveCsharpQueryParamsType = function resolveCsharpQueryParamsType(groupName, functinName) {
+    return `${groupName}${functinName}QueryParam`;
+};
+
+exports.resolveCsharpBodyParamsType = function resolveCsharpBodyParamsType(groupName, functinName) {
+    return `${groupName}${functinName}BodyParam`;
+};

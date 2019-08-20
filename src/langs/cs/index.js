@@ -5,15 +5,19 @@
 const path = require('path');
 
 const { tagGroup_operatorIdMethod } = require('../../utils/indexesGenerator');
-const { resolveCsharpType } = require('../../utils/typeResolvers');
+const { resolveCsharpType, resolveCsharpQueryParamsType, resolveCsharpBodyParamsType } = require('../../utils/typeResolvers');
 
 module.exports = {
     // 默认命名空间
     namespace: "RestApi",
     // 功能函数
     helpers: {
-        // 转换为c#类型
+        // 解释为c#类型名称
         resolveType: resolveCsharpType,
+        // 解释为c# query参数类型名称
+        resolveQueryType: resolveCsharpQueryParamsType,
+        // 解析为c# body 参数类型名称
+        resolveBodyType: resolveCsharpBodyParamsType,
         // 获取方法名与组的索引
         getIndexes: tagGroup_operatorIdMethod
     },

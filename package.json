@@ -1,13 +1,13 @@
 {
   "name": "csharp-rest-client-builder",
   "version": "0.2.0",
-  "description": "用于生成C#，RestApiClient客户端库的代码生成器",
+  "description": "用于生成C#、JS，RestApiClient客户端库的代码生成器",
   "main": "index.js",
   "scripts": {
     "test": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/etshp -n etshp"
   },
   "bin": {
-    "restapi-build": "bin/cli.js"
+    "restapiclient": "bin/cli.js"
   },
   "keywords": [
     "codegen",
