@@ -1,10 +1,11 @@
 {
-  "name": "rest-client-builder",
-  "version": "1.0.0",
+  "name": "rest-api-client-builder",
+  "version": "1.0.1",
   "description": "用于生成C#、JS，RestApiClient客户端库的代码生成器",
   "main": "index.js",
   "scripts": {
-    "test": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/etshp -n etshp"
+    "test": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/etshp -n etshp",
+    "test1": "node bin/cli.js https://192.168.10.103:8090/swagger/v1/swagger.json -o ./test/output/test1 -n test1 -a"
   },
   "bin": {
     "restclient": "bin/cli.js"

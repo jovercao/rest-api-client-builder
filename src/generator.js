@@ -1,10 +1,11 @@
 const defaultConfig = require('../config/default.config.json');
 const { tppl } = require('tppl');
-const http = require('axios');
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
-var mkdirp = require('mkdirp');
+const mkdirp = require('mkdirp');
+const https = require('https');
 
 const { tagGroup_operatorIdMethod } = require('./utils/indexesGenerator');
 const langs = require('./langs');
@@ -62,6 +63,13 @@ module.exports = async function run(optionsConfig) {
         console.error('ERROR: 未配置swaggerUrl，您也可以在配置文件中添加该项，也可以从参数进行传递');
         return;
     }
+
+    // https时，allowUnauthorized选项
+    const http = config.swaggerUrl.startsWith('https://') ? axios.create({
+        httpsAgent: new https.Agent({
+            rejectUnauthorized: !config.allowUnauthorized
+        })
+    }) : axios;
 
     try {
         let swaggerDoc;

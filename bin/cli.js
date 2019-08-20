@@ -8,6 +8,7 @@ program.version(version)
     .option('-n --name <name>', 'Api客户端名称')
     .option('-o --output-dir <dir>', '生成的文件输出路径，默认值：outputs')
     .option('-d --models-dir <dir>', 'Models的输出路径，默认值：ClientModels')
+    .option('-a --allow-unauthorized', '允许未经过签名验证的https请求')
     .option('-l --lang <lang>', '指定要生成的语言/方式， 目前支持：\n       cs - 基于RestClient的c# api客户端 \n        es6 - 基于axios的api客户端')
     .action((swaggerUrl, options) => {
         var cmdOptions = {};
@@ -30,7 +31,9 @@ program.version(version)
         if (options.name) {
             cmdOptions.name = options.name;
         }
-
+        if (options.allowUnauthorized) {
+            cmdOptions.allowUnauthorized = options.allowUnauthorized;
+        }
         require('../index')(cmdOptions);
     });
 
