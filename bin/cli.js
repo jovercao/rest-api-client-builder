@@ -37,6 +37,4 @@ program.version(version)
         require('../index')(cmdOptions);
     });
 
-console.log(process.argv);
-
 program.parse(process.argv);

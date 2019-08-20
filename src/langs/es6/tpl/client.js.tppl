@@ -6,7 +6,7 @@
 import axios from 'axios';
 
 const http = axios.create({
-    baseURL: '[:=this.$config.baseUrl:]'
+    baseURL: '[:=this.$config.baseUrl || '':]'
 });
 
 /**
@@ -47,25 +47,26 @@ for (const [groupName, groupInfo] of Object.entries(this.current)) {
         if (queryParams.length) {
             args.push('$query');
         }
-        if (bodyParams.length) {
+        const hasBody = ['post', 'put'].includes(method);
+        if (hasBody) {
             args.push('$body');
         }
 :]
         /** 
         * [:=define.summary || '':][: if (pathParams.length) {:]
         * [:=pathParams.map(p => `@param {${this.$helpers.resolveType(p)}} ${p.name} ${p.format || ''} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        * ') :][:}:]
-[:if(queryParams.length) {:]        * @param {*} $query
+[:if(queryParams.length) {:]        * @param {*} $query 查询字符串参数
         *    [:= queryParams.map(p=> `${p.name}: ${this.$helpers.resolveType(p)} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        *    '):]
-[:}:] [:if(bodyParams.length) {:]        * @param {*} $body
+[:}:][:if(hasBody) {:]        * @param {*} $body http内容参数
         *    [:= bodyParams.map(p=> `${p.name}: ${this.$helpers.resolveType(p)} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        *    '):]
 [:}:]        * @returns {[:= this.$helpers.resolveType(define.responses[200]) :]} [:= this.$helpers.resolveType(define.responses[200]) :]
         */
         async [:=fn:]([:=args.join(', '):]) {
             const path = `[:=tplPath:]`;
             const res = await http({
-                method: [:=method:],
+                method: '[:=method:]',
                 url: path[:if (queryParams.length) {:],
-                params: $query[:} if (bodyParams.length>0) {:],
+                params: $query[:} if (hasBody) {:],
                 data: $body[:}:]
             });
             return res.data;
@@ -80,7 +81,4 @@ for (const [groupName, groupInfo] of Object.entries(this.current)) {
 }
 
 
-// 注册全局命令空间
-(globa || globaThis || window || this).[:= this.$config.namespace :] = api;
-
-export default api;
+export default apis;
