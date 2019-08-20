@@ -10,8 +10,10 @@
             "name": "Launch Program",
             "program": "${workspaceFolder}\\bin\\cli.js",
             "args": [
-                "-o test/output/etshp",
-                "-n etsh",
+                "-o",
+                "test/output/etshp",
+                "-n",
+                "etsh",
                 "test/etshp.swagger.json"
             ]
         }

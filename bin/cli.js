@@ -28,7 +28,7 @@ program.version(version)
         if (options.lang) {
             cmdOptions.lang = options.lang;
         }
-        if (options.name) {
+        if (options.name && typeof options.name !== 'function') {
             cmdOptions.name = options.name;
         }
         if (options.allowUnauthorized) {
@@ -36,5 +36,7 @@ program.version(version)
         }
         require('../index')(cmdOptions);
     });
+
+console.log(process.argv);
 
 program.parse(process.argv);

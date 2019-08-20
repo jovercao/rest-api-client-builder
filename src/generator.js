@@ -42,28 +42,33 @@ function writeFile(filePath, data) {
 
 module.exports = async function run(optionsConfig) {
     const config = Object.assign({}, defaultConfig);
-    var cwdConfigPath = path.resolve(process.cwd(), '.restapi.config');
+    var cwdConfigPath = path.resolve(process.cwd(), '.restclient.json');
     let cwdConfig, userConfig;
     if (fs.existsSync(cwdConfigPath)) {
         cwdConfig = require(cwdConfigPath);
     }
-    var userConfigPath = path.resolve('~', '.restapi.config');
+    var userConfigPath = path.resolve('~', '.restclient.json');
     if (fs.existsSync(userConfigPath)) {
         userConfig = require(userConfigPath);
     }
     Object.assign(config, cwdConfig, userConfig, optionsConfig);
-    if (!config.baseUrl && config.swaggerUrl.startsWith('http')) {
-        config.baseUrl = new URL(config.swaggerUrl).origin;
-    }
 
     // 语言上下文对象
     const langSettings = langs[config.lang];
 
+    if (!langSettings) {
+        console.error(`ERROR: 不支持的的语言${config.lang}`);
+        return;
+    }
     if (!config.swaggerUrl) {
         console.error('ERROR: 未配置swaggerUrl，您也可以在配置文件中添加该项，也可以从参数进行传递');
         return;
     }
 
+    if (!config.baseUrl && config.swaggerUrl.startsWith('http')) {
+        config.baseUrl = new URL(config.swaggerUrl).origin;
+    }
+    
     // https时，allowUnauthorized选项
     const http = config.swaggerUrl.startsWith('https://') ? axios.create({
         httpsAgent: new https.Agent({

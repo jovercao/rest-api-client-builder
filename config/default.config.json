@@ -1,8 +1,8 @@
 {
     "swaggerUrl": null,
-    "namespace": "api",
+    "namespace": "rest",
+    "name": "api",
     "outputDir": "./restApi",
     "modelsDir": "models",
-    "lang": "es6",
-    "name": "api"
+    "lang": "es6"
 }

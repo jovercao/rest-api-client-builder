@@ -16,7 +16,7 @@ module.exports = {
         {
             tplFile: path.join(__dirname, './tpl/client.js.tppl'),
             output: '${name}Client.js'
-        },
+        }
         // {
         //     tplFile: path.join(__dirname, './tpl/client.d.ts.tppl'),
         //     output: '${namespace}Client.client.d.ts'
