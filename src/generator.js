@@ -6,6 +6,7 @@ const path = require('path');
 const { URL } = require('url');
 const mkdirp = require('mkdirp');
 const https = require('https');
+const makeParamsTypeDefine = require('./utils/paramsTypeDefine');
 
 const { tagGroup_operatorIdMethod } = require('./utils/indexesGenerator');
 const langs = require('./langs');
@@ -134,11 +135,17 @@ module.exports = async function run(optionsConfig) {
             mkdirp.sync(modelsDir);
         }
 
+        // 获取类型定义
+        const defines = {
+            ...swaggerDoc.definitions,
+            ...makeParamsTypeDefine(swaggerDoc)
+        };
 
-        // 生成client客户端
+        // 生成Model
         for (const item of langSettings.model) {
-            if (langSettings.model.multiFile) {
-                for([name, model] of Object.entries(swaggerDoc.definitions)) {
+            
+            if (item.multiFile) {
+                for ([name, model] of Object.entries(defines)) {
                     // 上下文对象
                     const context = {
                         $helpers: langSettings.helpers,
@@ -156,7 +163,7 @@ module.exports = async function run(optionsConfig) {
                 const context = {
                     $helpers: langSettings.helpers,
                     $config: config,
-                    current: swaggerDoc.definitions,
+                    current: defines,
                     $name: config.name,
                     $doc: swaggerDoc
                 };

@@ -4,5 +4,6 @@
     "name": "api",
     "outputDir": "./restApi",
     "modelsDir": "models",
-    "lang": "es6"
+    "lang": "es6",
+    "allowUnauthorized": false
 }

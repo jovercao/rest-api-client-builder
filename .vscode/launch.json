@@ -7,13 +7,32 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "es6",
             "program": "${workspaceFolder}\\bin\\cli.js",
             "args": [
                 "-o",
                 "test/output/etshp",
                 "-n",
                 "etsh",
+                "-l",
+                "es6",
+                "test/etshp.swagger.json"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "cs",
+            "program": "${workspaceFolder}\\bin\\cli.js",
+            "args": [
+                "-o",
+                "test/output/CsEtshp",
+                "-n",
+                "Api",
+                "-N",
+                "Etsh",
+                "-l",
+                "cs",
                 "test/etshp.swagger.json"
             ]
         }

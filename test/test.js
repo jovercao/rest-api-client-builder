@@ -1,5 +1,4 @@
 const api = require('./output/etshp/etshpClient')
-
 describe('测试', function() {
     it('测试1', () => {
         console.log(api.$http);
@@ -21,4 +20,6 @@ describe('测试', function() {
         //     "Id": 0
         // });
     });
+
+
 });

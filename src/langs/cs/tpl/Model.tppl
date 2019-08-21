@@ -4,18 +4,18 @@
 */
 using System;
 
-namespace [:=config.clientNamespace:].[:=config.modelsNamespace:]
+namespace [:=$config.namespace:]
 {
-    public class [:=modelName:]
+    public class [:=$name:]
     {
 
 [:
-for (const [propname, propinfo] of Object.entries(model.properties)) {
+for (const [propname, propinfo] of Object.entries(current.properties)) {
 :]
         /// <summary>
         /// [:=propinfo.summary || propinfo.description || '':]
         /// </summary>
-        public [:=resolveType(propinfo):] [:=propname:] { get; set; }
+        public [:=$helpers.resolveType(propinfo):] [:=propname:] { get; set; }
 [:
 }
 :]

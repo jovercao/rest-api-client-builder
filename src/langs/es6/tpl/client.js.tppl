@@ -4,9 +4,13 @@
 * 作者： Jover
 */
 import axios from 'axios';
+import qs from 'qs';
 
 const http = axios.create({
-    baseURL: '[:=this.$config.baseUrl || '':]'
+    baseURL: '[:=this.$config.baseUrl || '':]',
+    paramsSerializer: function(params) {
+        return qs.stringify(params, { allowDots: true });
+    }
 });
 
 /**
@@ -30,18 +34,6 @@ for (const [groupName, groupInfo] of Object.entries(this.current)) {
         const pathParams = parameters.filter(p => p.in === 'path');
         const queryParams = parameters.filter(p => p.in === 'query');
         const bodyParams = parameters.filter(p => p.in === 'body');
-        /** 注释处理
-        * const queryParams = parameters.filter(p => p.in === 'query').reduce((total, current) => {
-        *     const argName = parameters.filter(p => p.name === current.name).length > 1 ? current.name + 'InQuery' : current.name;
-        *     total[argName] = current;
-        *     return total;
-        * }, {});
-        * const bodyParams = parameters.filter(p => p.in === 'body').reduce((total, current) => {
-        *     const argName = parameters.filter(p => p.name === current.name).length > 1 ? current.name + 'InBody' : current.name;
-        *     total[argName] = current;
-        *     return total;
-        * }, {});
-        */
 
         const args = [ ...pathParams.map(p => p.name) ];
         if (queryParams.length) {

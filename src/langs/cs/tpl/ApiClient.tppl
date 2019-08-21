@@ -9,7 +9,7 @@ namespace [:= this.$config.namespace :]
 {
     /// <summary>
     /// RestSharp 文档地址 https://github.com/restsharp/RestSharp
-    /// swagger 地址：[:=config.swaggerUrl:]
+    /// swagger 地址：[:=this.$config.swaggerUrl:]
     /// </summary> 
     public partial class [:=this.$name:]Client
     {
@@ -20,25 +20,29 @@ namespace [:= this.$config.namespace :]
         }
 
 [:
-for(const [fn, [ method, path, methodInfo ]] of Object.entries(this.current)) {
+for(const [fn, [ method, path, methodInfo ]] of Object.entries(current)) {
     const methods = Object.keys(pathDefine);
-    let returnType = this.resolveType(method.responses['200']);
+    let returnType = $helpers.resolveType(method.responses['200']);
     const parameters = define.parameters || [];
     /* 参数名重复处理 */
     const pathParams = parameters.filter(p => p.in === 'path');
-    const queryParams = parameters.filter(p => p.in === 'query');
-    const bodyParams = parameters.filter(p => p.in === 'body');
+    const hasQuery = parameters.filter(p => p.in === 'query').length > 0;
+    const hasBody = ['post', 'put'].includes(method);
+    /* 查询字符串对象名称 */
+    const queryParamType = $helpers.resolveQueryType($name, fn);
+    const bodyParamType =  $helpers.resolveBodyType($name, fn);
 :]
         /// <summary>
         /// [:=methodInfo.summary:]
         /// </summary>
 [:=(pathParams).map(p => `        /// <param name="${p.name}">${p.description}</param>`).join('\r\n'):]
-        public [:=returnType:] [:=fn:]([:= pathParams.map(parameter => this.resolveType(parameter) + ' ' + parameter.name).join(',') :],
-            $query, $body)
+        public [:=returnType:] [:=fn:]([:= pathParams.map(parameter => $helpers.resolveType(parameter) + ' ' + parameter.name).join(',') :][:=hasQuery ? `, ${queryParamType} _query` : '':][:=hasBody ? `, ${bodyParamType} _body` : '' :])
         {
             var path = $"[:=path:]";
             var request = new RestRequest(path, RestSharp.Method.[:=method.toUpperCase():]);
-            request.AddJsonObject()
+[:if (hasBody) {:]
+            request.AddJsonObject(_body);
+[:}:]
             var response = client.ExecuteTaskAsync(request);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<[:=returnType:]>(response.Content);
         }
