@@ -2,49 +2,61 @@
 * 本文档由swagger客户端生成工具自动生成
 * 作者： Jover
 */
-using Newtonsoft.Json;
-using RestSharp;
+using System.Threading.Tasks;
 
-namespace [:= this.$config.namespace :]
+namespace [:= $config.namespace :]
 {
     /// <summary>
     /// RestSharp 文档地址 https://github.com/restsharp/RestSharp
-    /// swagger 地址：[:=this.$config.swaggerUrl:]
+    /// swagger 地址：[:=$config.swaggerUrl:]
     /// </summary> 
-    public partial class [:=this.$name:]Client
+    public partial class [:=$name:]Client
     {
-        private RestClient client;
-        public ApiClient(string url = "[:=this.$config.baseUrl:]")
+        private RestSharp.RestClient client;
+        public [:=$name:]Client(string url = "[:=$config.baseUrl:]")
         {
-            client = new RestClient(url);
+            client = new RestSharp.RestClient(url);
         }
 
 [:
-for(const [fn, [ method, path, methodInfo ]] of Object.entries(current)) {
-    const methods = Object.keys(pathDefine);
-    let returnType = $helpers.resolveType(method.responses['200']);
+
+for (const [ fn, [ method, path, define ]] of Object.entries(current)) {
+    const returnInfo = define.responses['200'];
+    const returnType = $helpers.resolveType(returnInfo);
+    const hasReturn = (returnType !== 'void');
     const parameters = define.parameters || [];
-    /* 参数名重复处理 */
     const pathParams = parameters.filter(p => p.in === 'path');
     const hasQuery = parameters.filter(p => p.in === 'query').length > 0;
     const hasBody = ['post', 'put'].includes(method);
-    /* 查询字符串对象名称 */
-    const queryParamType = $helpers.resolveQueryType($name, fn);
-    const bodyParamType =  $helpers.resolveBodyType($name, fn);
+    const hasBodyType = parameters.filter(p => p.in === 'body').length > 0;
+
+    const params = pathParams.map(p => `${$helpers.resolveType(p)} ${p.name}`);
+    if (hasQuery) {
+        const queryParamType = $helpers.resolveQueryType($name, fn);
+        params.push(`${queryParamType} _query`);
+    }
+    if (hasBody) {
+        const bodyParamType = hasBodyType ? $helpers.resolveBodyType($name, fn) : 'object';
+        params.push(`${bodyParamType} _body`);
+    }
+
 :]
         /// <summary>
-        /// [:=methodInfo.summary:]
+        /// [:=define.summary:]
         /// </summary>
-[:=(pathParams).map(p => `        /// <param name="${p.name}">${p.description}</param>`).join('\r\n'):]
-        public [:=returnType:] [:=fn:]([:= pathParams.map(parameter => $helpers.resolveType(parameter) + ' ' + parameter.name).join(',') :][:=hasQuery ? `, ${queryParamType} _query` : '':][:=hasBody ? `, ${bodyParamType} _body` : '' :])
+[:=pathParams.map(p => `        /// <param name="${p.name}">${p.description}</param>`).join('\n'):]
+[:if (hasReturn) {:]        /// <returns>[:=returnInfo.description:]</returns>[:}:]
+        public async [:= hasReturn ? `Task<${returnType}>` : 'void' :] [:=fn:]([:=params.join(', '):])
         {
-            var path = $"[:=path:]";
-            var request = new RestRequest(path, RestSharp.Method.[:=method.toUpperCase():]);
+            var path = $"[:=path:]"[:=hasQuery ? ' + "?" + QueryString.QS.Stringify(_query)' : '':];
+            var request = new RestSharp.RestRequest(path, RestSharp.Method.[:=method.toUpperCase():]);
 [:if (hasBody) {:]
-            request.AddJsonObject(_body);
+            request.AddJsonBody(_body);
 [:}:]
-            var response = client.ExecuteTaskAsync(request);
+            [:=hasReturn ? 'var response = ' : '':]await client.ExecuteTaskAsync(request);
+[:if (hasReturn) {:]
             return Newtonsoft.Json.JsonConvert.DeserializeObject<[:=returnType:]>(response.Content);
+[:}:]
         }
 [:
 }

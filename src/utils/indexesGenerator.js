@@ -1,10 +1,9 @@
 /**
  * 以tags为属性为groupName，以operationId为方法名
- * @returns * 索引
+ * @param {object} swaggerDoc 文档
+ * @returns {object} 索引
  */
-
-
-exports.tagGroup_operatorIdMethod = function(swaggerDoc) {
+function tagGroup_operatorIdMethod(swaggerDoc) {
     return Object.entries(swaggerDoc.paths).reduce((total, [path, pathInfo]) => {
         for (const [method, methodInfo] of Object.entries(pathInfo)) {
             const groupName = methodInfo.tags[0];
@@ -18,3 +17,5 @@ exports.tagGroup_operatorIdMethod = function(swaggerDoc) {
         return total;
     }, {});
 };
+
+exports.tagGroup_operatorIdMethod = tagGroup_operatorIdMethod;

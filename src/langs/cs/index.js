@@ -24,6 +24,7 @@ module.exports = {
     // 客户端生成项配置
     client: [
         {
+            multiFile: true,
             tplFile: path.resolve(__dirname, './tpl/ApiClient.tppl'),
             // 可用参数：name - 名称， namespace - 命名空间
             output: '${name}Client.cs'

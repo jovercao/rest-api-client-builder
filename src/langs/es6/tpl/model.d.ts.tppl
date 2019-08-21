@@ -1,24 +1,3 @@
 /*
-* 本文档由swagger客户端生成工具自动生成
-* 作者： Jover
+* model描述 .d.ts文档
 */
-using System;
-
-namespace [:=config.clientNamespace:].[:=config.modelsNamespace:]
-{
-    public class [:=modelName:]
-    {
-
-[:
-for (const [propname, propinfo] of Object.entries(model.properties)) {
-:]
-        /// <summary>
-        /// [:=propinfo.summary || propinfo.description || '':]
-        /// </summary>
-        public [:=resolveType(propinfo):] [:=propname:] { get; set; }
-[:
-}
-:]
-
-    }
-}

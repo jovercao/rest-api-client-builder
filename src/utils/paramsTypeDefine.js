@@ -6,6 +6,7 @@
  * @returns {array} 返回类型定义列表
  */
 function makeTypeDefine(params, typeName) {
+    if (params.length === 0) return {};
     // 当前对象类型
     const mainTypeDefine = {
         type: 'object',
@@ -59,11 +60,11 @@ function makeTypeDefine(params, typeName) {
 function makeMethodParamTypeDefines(methodInfo) {
     const params = methodInfo.parameters || [];
     const queryParams = params.filter(p => p.in === 'query');
-    const queryTypeName = methodInfo.tags[0] + methodInfo.operationId + 'QueryInfo';
+    const queryTypeName = methodInfo.tags[0] + methodInfo.operationId + 'QueryParam';
     const queryTypeDefines = makeTypeDefine(queryParams, queryTypeName);
 
     const bodyParams = params.filter(p => p.in === 'body');
-    const bodyTypeName = methodInfo.tags[0] + methodInfo.operationId + 'BodyInfo';
+    const bodyTypeName = methodInfo.tags[0] + methodInfo.operationId + 'BodyParam';
     const bodyTypeDefines = makeTypeDefine(bodyParams, bodyTypeName);
 
     return {

@@ -41,8 +41,9 @@ restclient --help
 
 ### cs
 
-- `RestSharp@105.2.3.0`
-- `Newtonsoft.Json@8.0.3`
+- `RestSharp`
+- `Newtonsoft.Json`
+- `QuerString`
 
 请为使用代码的项目添加以上Nuget依赖。
 
@@ -67,13 +68,11 @@ ES6生成代码后依赖以下库运行：
     "namespace": "RestApiClient",
     // Client的名称，默认为`api`
     "name": "Api",
-    // 输出的语言，默认为`es6`
+    // 输出的语言，默认为`es6`，目前支持 [ 'es6', 'cs' ]
     "lang": "es6",
     // 不验证https证书，默认为`false`，用于自生成证书的swagger路径访问
     "allowUnauthorized": false,
     // 生成的文件输出路径，默认值：outputs
-    "outputDir": "../",
-    // Models的输出路径，默认值：ClientModels
-    "modelsDir": "ClientModels"
+    "outputDir": "../"
 }
 ```

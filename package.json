@@ -4,8 +4,8 @@
   "description": "用于生成C#、JS，RestApiClient客户端库的代码生成器",
   "main": "index.js",
   "scripts": {
-    "estest": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/es6 -n api",
-    "cstest": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/csharp -n test1 -a -l cs",
+    "es6": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/es6 -n api",
+    "cs": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/csharp -n test1 -a -l cs",
     "online": "node bin/cli.js https://192.168.10.103:8090/swagger/v1/swagger.json -o ./test/output/test1 -n Api -N Etshp -a -l es6"
   },
   "bin": {
@@ -24,7 +24,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "commander": "^2.20.0",
-    "mkdirp": "^0.5.1",
-    "tppl": "^0.1.0"
+    "js-tppl": "^1.0.0",
+    "mkdirp": "^0.5.1"
   }
 }

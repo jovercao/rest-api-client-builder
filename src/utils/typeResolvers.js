@@ -2,22 +2,28 @@
 // 将schema解析为c#类型
 exports.resolveCsharpType = function resolveCsharpType(schema) {
     if (schema.type) {
-        if (schema.type === 'array') {
-            return resolveCsharpType(schema.items) + '[]';
-        }
-        if (schema.format) {
-            switch (schema.format) {
-                case 'int32':
-                    return 'int';
-                case 'int64':
-                    return 'long';
-                case 'date-time':
-                    return 'DateTime';
-                default:
-                    return schema.format;
-            }
-        }
         switch (schema.type) {
+            case 'array':
+                return resolveCsharpType(schema.items) + '[]';
+            case 'string':
+                switch (schema.format) {
+                    case 'uuid':
+                        return 'Guid';
+                    case 'date-time':
+                        return 'DateTime';
+                    default:
+                        return 'string';
+                }
+            case 'integer':
+            case 'number':
+                switch(schema.format) {
+                    case 'int32':
+                        return 'int';
+                    case 'int64':
+                        return 'long';
+                    default:
+                        return schema.format;
+                }
             case 'boolean':
                 return 'bool';
             default:
@@ -25,7 +31,7 @@ exports.resolveCsharpType = function resolveCsharpType(schema) {
         }
     }
     if (schema.$ref) {
-        return schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1);
+        return schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1).replace(/\[/g, '_').replace(/\]/g, '_').replace(/\,/g, '_');
     }
     if (schema.schema) {
         return resolveCsharpType(schema.schema);
@@ -37,24 +43,28 @@ exports.resolveCsharpType = function resolveCsharpType(schema) {
 // 将schema解析为typescript类型
 exports.resolveTypescriptType = function resolveTypescriptType(schema) {
     if (schema.type) {
-        if (schema.type === 'array') {
-            return resolveTypescriptType(schema.items) + '[]';
+        switch (schema.type) {
+            case 'array':
+                return resolveCsharpType(schema.items) + '[]';
+            case 'integer':
+            case 'double':
+            case 'number':
+                return 'number';
+            case 'string':
+                switch (schema.format) {
+                    case 'uuid':
+                        return 'Guid';
+                    case 'date-time':
+                        return 'date';
+                    default:
+                        return 'string';
+                }
+            default:
+                return schema.type;
         }
-        if (schema.format) {
-            switch (schema.format) {
-                case 'int32':
-                case 'int64':
-                    return 'number';
-                case 'date-time':
-                    return 'date';
-                default:
-                    return schema.format;
-            }
-        }
-        return schema.type;
     }
     if (schema.$ref) {
-        return schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1);
+        return schema.$ref.substring(schema.$ref.lastIndexOf('/') + 1).replace(/\[/g, '<').replace(/\]/g, '>');;
     }
     if (schema.schema) {
         return resolveTypescriptType(schema.schema);

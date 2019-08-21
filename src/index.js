@@ -1,5 +1,5 @@
 const defaultConfig = require('../config/default.config.json');
-const { tppl } = require('tppl');
+const tppl = require('js-tppl');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -12,14 +12,18 @@ const { tagGroup_operatorIdMethod } = require('./utils/indexesGenerator');
 const langs = require('./langs');
 
 /**
- * 
- * @param {*} tplFile 模板文件
- * @param {*} context 渲染数据
- * @param {*} outputPath 输出路径
+ * 生成文件
+ * @param {string} tpl? 模板文件
+ * @param {string} tplFile 模板文件
+ * @param {object} context 渲染数据
+ * @param {string} outputPath 输出路径
  */
-function generate(tplFile, context, outputPath) {
-    var apiClientTpl = readFile(tplFile);
-    const render = tppl(apiClientTpl);
+function renderToFile(tpl, tplFile, context, outputPath) {
+    if (!tpl) {
+        const filePath = path.resolve(__dirname, tplFile);
+        tpl = fs.readFileSync(filePath).toString();
+    }
+    const render = tppl(tpl);
     const content = render(context);
     
     const outputDir = path.dirname(outputPath);
@@ -27,18 +31,9 @@ function generate(tplFile, context, outputPath) {
     if (!fs.existsSync(outputDir)) {
         mkdirp.sync(outputDir);
     }
-    writeFile(outputPath, content);
-}
 
-
-function readFile(filePath) {
-    filePath = path.resolve(__dirname, filePath);
-    return fs.readFileSync(filePath).toString();
-}
-
-function writeFile(filePath, data) {
-    filePath = path.resolve(__dirname, filePath);
-    fs.writeFileSync(filePath, data);
+    const filePath = path.resolve(__dirname, outputPath);
+    fs.writeFileSync(filePath, content);
 }
 
 module.exports = async function run(optionsConfig) {
@@ -114,7 +109,7 @@ module.exports = async function run(optionsConfig) {
                     };
                     const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', group);
                     const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
-                    generate(item.tpl || item.tplFile, context, outputPath);
+                    renderToFile(item.tpl, item.tplFile, context, outputPath);
                 }
             } else {
                 const context = {
@@ -126,26 +121,24 @@ module.exports = async function run(optionsConfig) {
                 };
                 const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', config.name);
                 const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
-                generate(item.tpl || item.tplFile, context, outputPath);
+                renderToFile(item.tpl, item.tplFile, context, outputPath);
             }
         }
 
-        const modelsDir = path.resolve(process.cwd(), config.outputDir, config.modelsDir || 'models');
-        if (!fs.existsSync(modelsDir)) {
-            mkdirp.sync(modelsDir);
-        }
-
+        const paramsDefines = makeParamsTypeDefine(swaggerDoc);
         // 获取类型定义
         const defines = {
             ...swaggerDoc.definitions,
-            ...makeParamsTypeDefine(swaggerDoc)
+            ...paramsDefines
         };
 
         // 生成Model
         for (const item of langSettings.model) {
             
             if (item.multiFile) {
-                for ([name, model] of Object.entries(defines)) {
+                for (let [name, model] of Object.entries(defines)) {
+                    name = name.replace(/(\[|\]|\,)/g, '_');
+
                     // 上下文对象
                     const context = {
                         $helpers: langSettings.helpers,
@@ -155,8 +148,8 @@ module.exports = async function run(optionsConfig) {
                         $doc: swaggerDoc
                     };
                     const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', name);
-                    const outputPath = path.resolve(process.cwd(), config.outputDir, config.modelsDir, fileName);
-                    generate(item.tpl || item.tplFile, context, outputPath);
+                    const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
+                    renderToFile(item.tpl, item.tplFile, context, outputPath);
                 }
             } else {
                 // 上下文对象
@@ -168,8 +161,8 @@ module.exports = async function run(optionsConfig) {
                     $doc: swaggerDoc
                 };
                 const fileName = item.output.replace('${namespace}', config.namespace).replace('${name}', context.name);
-                const outputPath = path.resolve(process.cwd(), config.outputDir, config.modelsDir, fileName);
-                generate(item.tpl || item.tplFile, context, outputPath);
+                const outputPath = path.resolve(process.cwd(), config.outputDir, fileName);
+                renderToFile(item.tpl, item.tplFile, context, outputPath);
             }
         }
     } catch(ex) {

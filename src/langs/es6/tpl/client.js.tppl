@@ -7,7 +7,7 @@ import axios from 'axios';
 import qs from 'qs';
 
 const http = axios.create({
-    baseURL: '[:=this.$config.baseUrl || '':]',
+    baseURL: '[:=$config.baseUrl || '':]',
     paramsSerializer: function(params) {
         return qs.stringify(params, { allowDots: true });
     }
@@ -20,7 +20,7 @@ const http = axios.create({
 const apis = {
     $http: http,
 [:
-for (const [groupName, groupInfo] of Object.entries(this.current)) {
+for (const [groupName, groupInfo] of Object.entries(current)) {
 :]
     [:=groupName:]: {
 [:
@@ -46,12 +46,12 @@ for (const [groupName, groupInfo] of Object.entries(this.current)) {
 :]
         /** 
         * [:=define.summary || '':][: if (pathParams.length) {:]
-        * [:=pathParams.map(p => `@param {${this.$helpers.resolveType(p)}} ${p.name} ${p.format || ''} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        * ') :][:}:]
+        * [:=pathParams.map(p => `@param {${$helpers.resolveType(p)}} ${p.name} ${p.format || '-'}，${p.required ? '必填' : ''}，${p.description || ''}`).join('\n        * ') :][:}:]
 [:if(queryParams.length) {:]        * @param {*} $query 查询字符串参数
-        *    [:= queryParams.map(p=> `${p.name}: ${this.$helpers.resolveType(p)} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        *    '):]
+        *    [:= queryParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n        *    '):]
 [:}:][:if(hasBody) {:]        * @param {*} $body http内容参数
-        *    [:= bodyParams.map(p=> `${p.name}: ${this.$helpers.resolveType(p)} ${p.required ? '必填' : ''} ${p.description || ''}`).join('\n        *    '):]
-[:}:]        * @returns {[:= this.$helpers.resolveType(define.responses[200]) :]} [:= this.$helpers.resolveType(define.responses[200]) :]
+        *    [:= bodyParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n        *    '):]
+[:}:]        * @returns {[:= $helpers.resolveType(define.responses[200]) :]} [:= $helpers.resolveType(define.responses[200]) :]
         */
         async [:=fn:]([:=args.join(', '):]) {
             const path = `[:=tplPath:]`;
