@@ -1,6 +1,6 @@
 
 // 将schema解析为c#类型
-exports.resolveCsharpType = function resolveCsharpType(schema) {
+function resolveCsharpType(schema) {
     if (schema.type) {
         switch (schema.type) {
             case 'array':
@@ -41,11 +41,11 @@ exports.resolveCsharpType = function resolveCsharpType(schema) {
 };
 
 // 将schema解析为typescript类型
-exports.resolveTypescriptType = function resolveTypescriptType(schema) {
+function resolveTypescriptType(schema) {
     if (schema.type) {
         switch (schema.type) {
             case 'array':
-                return resolveCsharpType(schema.items) + '[]';
+                return resolveTypescriptType(schema.items) + '[]';
             case 'integer':
             case 'double':
             case 'number':
@@ -73,10 +73,16 @@ exports.resolveTypescriptType = function resolveTypescriptType(schema) {
     // throw new Error(`未能转换类型${schema}`);
 };
 
-exports.resolveCsharpQueryParamsType = function resolveCsharpQueryParamsType(groupName, functinName) {
+function resolveCsharpQueryParamsType(groupName, functinName) {
     return `${groupName}${functinName}QueryParam`;
 };
 
-exports.resolveCsharpBodyParamsType = function resolveCsharpBodyParamsType(groupName, functinName) {
+function resolveCsharpBodyParamsType(groupName, functinName) {
     return `${groupName}${functinName}BodyParam`;
 };
+
+
+exports.resolveCsharpType = resolveCsharpType;
+exports.resolveTypescriptType = resolveTypescriptType;
+exports.resolveCsharpQueryParamsType = resolveCsharpQueryParamsType;
+exports.resolveCsharpBodyParamsType = resolveCsharpBodyParamsType;

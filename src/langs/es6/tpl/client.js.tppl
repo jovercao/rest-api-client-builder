@@ -6,35 +6,33 @@
 import axios from 'axios';
 import qs from 'qs';
 
-const http = axios.create({
+export const $http = axios.create({
     baseURL: '[:=$config.baseUrl || '':]',
     paramsSerializer: function(params) {
         return qs.stringify(params, { allowDots: true });
     }
 });
 
-/**
-* swagger 地址：[:=$config.swaggerUrl:]
-* 本实例由axios创建 axios文档地址 https://github.com/axios/axios
-*/
-const apis = {
-    $http: http,
+
 [:
-for (const [groupName, groupInfo] of Object.entries(current)) {
+let entries = Object.entries(current);
+/*.map(([key, value]) => [ key[0].toLowerCase() + key.substring(1), value ]);*/
+for (const [groupName, groupInfo] of entries) {
 :]
-    [:=groupName:]: {
+export const [:=groupName:] = {
 [:
     for (const [functionName, functionInfo] of Object.entries(groupInfo)) {
 
         const [method, path, define] = functionInfo;
+        const returnInfo = define.responses[200];
+        const returnType = $helpers.resolveType(returnInfo);
+        const hasReturn = returnType !== 'void';
         const tplPath = path.replace(new RegExp('\\{', 'g'), '${');
         const parameters = define.parameters || [];
         const fn = functionName[0].toLowerCase() + functionName.substring(1);
-        /* 参数名重复处理 */
         const pathParams = parameters.filter(p => p.in === 'path');
         const queryParams = parameters.filter(p => p.in === 'query');
         const bodyParams = parameters.filter(p => p.in === 'body');
-
         const args = [ ...pathParams.map(p => p.name) ];
         if (queryParams.length) {
             args.push('$query');
@@ -44,33 +42,49 @@ for (const [groupName, groupInfo] of Object.entries(current)) {
             args.push('$body');
         }
 :]
-        /** 
-        * [:=define.summary || '':][: if (pathParams.length) {:]
-        * [:=pathParams.map(p => `@param {${$helpers.resolveType(p)}} ${p.name} ${p.format || '-'}，${p.required ? '必填' : ''}，${p.description || ''}`).join('\n        * ') :][:}:]
+    /** 
+    * [:=define.summary || '':][: if (pathParams.length) {:]
+    * [:=pathParams.map(p => `@param {${$helpers.resolveType(p)}} ${p.name} ${p.format || '-'}，${p.required ? '必填' : ''}，${p.description || ''}`).join('\n    * ') :][:}:]
 [:if(queryParams.length) {:]        * @param {*} $query 查询字符串参数
-        *    [:= queryParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n        *    '):]
+    *    [:= queryParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n    *    '):]
 [:}:][:if(hasBody) {:]        * @param {*} $body http内容参数
-        *    [:= bodyParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n        *    '):]
-[:}:]        * @returns {[:= $helpers.resolveType(define.responses[200]) :]} [:= $helpers.resolveType(define.responses[200]) :]
-        */
-        async [:=fn:]([:=args.join(', '):]) {
-            const path = `[:=tplPath:]`;
-            const res = await http({
-                method: '[:=method:]',
-                url: path[:if (queryParams.length) {:],
-                params: $query[:} if (hasBody) {:],
-                data: $body[:}:]
-            });
-            return res.data;
-        },
+    *    [:= bodyParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n    *    '):]
+[:}:]    * @returns {[:= returnType :]} [:= returnInfo.description :]
+    */
+    async [:=fn:]([:=args.join(', '):]) {
+        const path = `[:=tplPath:]`;
+        const $options = Object.assign({
+            method: '[:=method:]',
+            url: path[:if (queryParams.length) {:],
+            params: $query[:} if (hasBody) {:],
+            data: $body[:}:]
+        }, arguments[[:=args.length:]]);
+
+        [:if (hasReturn) {:]const res = [:}:]await $http($options);[:if (hasReturn) {:]
+        return res.data;[:}:]
+    },
 [:
     }
 :]
-    },
+};
+
 [:
 }
 :]
-}
 
+/**
+* swagger 地址：[:=$config.swaggerUrl:]
+* 本实例由axios创建 axios文档地址 https://github.com/axios/axios
+*/
+const apis = {
+    $http,[:
+let i = 0;
+for (const [groupName, groupInfo] of entries) {
+    i++;
+:]
+    [:=groupName:][:=i < entries.length ? ',' : '':][:
+}
+:]
+};
 
 export default apis;
