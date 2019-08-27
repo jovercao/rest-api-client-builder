@@ -14,6 +14,7 @@
 ## 使用方法
 
 **安装：**
+
 ```shell
 
 # 安装到全局npm
@@ -24,6 +25,7 @@ npm install --global rest-api-client-builder
 **生成命令：**
 
 命令说明：
+
 ```bat
 restclient [swaggerUrl] [-o outputDir] [-n name] [-N namespace] [-a allowUnauthorized] [-l lang]
 ```

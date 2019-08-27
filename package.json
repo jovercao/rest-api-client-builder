@@ -8,7 +8,8 @@
     "mp": "node bin/cli.js ./test/etshp.swagger.json -l mp -a -o ./test/output/mp -n api",
     "cs": "node bin/cli.js ./test/etshp.swagger.json -o ./test/output/csharp -n test1 -a -l cs",
     "online": "node bin/cli.js https://192.168.10.103:8090/swagger/v1/swagger.json -o ./test/output/test1 -n Api -N Etshp -a -l es6",
-    "clean": "rm -rf ./test/output/"
+    "clean": "rm -rf ./test/output/",
+    "lint": "eslint --fix ."
   },
   "bin": {
     "restclient": "bin/cli.js"
@@ -28,5 +29,8 @@
     "commander": "^2.20.0",
     "js-tppl": "^1.0.2",
     "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^6.2.2"
   }
 }

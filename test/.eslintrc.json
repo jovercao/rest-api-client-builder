@@ -1,0 +1,8 @@
+{
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly",
+        "describe": "readonly",
+        "it": "readonly"
+    }
+}
