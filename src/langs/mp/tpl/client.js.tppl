@@ -1,17 +1,40 @@
 /*
 * 本文档由swagger客户端生成工具自动生成
-* 使用axios作为ajax客户端库
+* 使用wx-promise-pro库
 * 作者： Jover
 */
-import axios from 'axios';
+import wxPro from 'wx-promise-pro';
 import qs from 'qs';
 
-export const $http = axios.create({
-    baseURL: '[:=$config.baseUrl || '':]',
-    paramsSerializer: function(params) {
-        return qs.stringify(params, { allowDots: true });
+const http = async function(config) {
+    let { url } = config;
+
+    if (config.params) {
+        url += '?' + qs.stringify(config.params, { allowDots: true });
     }
-});
+    const options = Object.assign(config, http.defaults);
+
+    if (http.defaults.baseURL && !url.match(/^https?\:\/\//)) {
+        let { baseURL } = http.defaults;
+        if (baseURL .endsWith('/')) {
+            baseURL = baseURL.substring(0, baseURL.length - 1);
+        }
+        if (url.startsWith('/')) {
+            url = url.substring(1);
+        }
+        options.url = `${baseURL}/${url}`;
+    } else {
+        options.url = url;
+    }
+
+    return await wxPro.request(options);
+}
+
+http.defaults = {
+    baseURL: '[:=$config.baseUrl || '':]',
+    dataType: 'json',
+    responseType: 'json'
+};
 
 [:
 let entries = Object.entries(current);
@@ -59,7 +82,7 @@ export const [:=groupName:] = {
             data: $body[:}:]
         }, arguments[[:=args.length:]]);
 
-        [:if (hasReturn) {:]const res = [:}:]await $http($options);[:if (hasReturn) {:]
+        [:if (hasReturn) {:]const res = [:}:]await http($options);[:if (hasReturn) {:]
         return res.data;[:}:]
     },
 [:
@@ -76,7 +99,7 @@ export const [:=groupName:] = {
 * 本实例由axios创建 axios文档地址 https://github.com/axios/axios
 */
 const apis = {
-    $http,[:
+    $http: http,[:
 let i = 0;
 for (const [groupName, groupInfo] of entries) {
     i++;
@@ -86,4 +109,5 @@ for (const [groupName, groupInfo] of entries) {
 :]
 };
 
+export const $http = http;
 export default apis;

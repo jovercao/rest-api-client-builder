@@ -11,11 +11,26 @@
             "program": "${workspaceFolder}\\bin\\cli.js",
             "args": [
                 "-o",
-                "test/output/etshp",
+                "test/output/es6",
                 "-n",
-                "etsh",
+                "api",
                 "-l",
-                "es6",
+                "mp",
+                "test/etshp.swagger.json"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "mp",
+            "program": "${workspaceFolder}\\bin\\cli.js",
+            "args": [
+                "-o",
+                "test/output/mp",
+                "-n",
+                "api",
+                "-l",
+                "mp",
                 "test/etshp.swagger.json"
             ]
         },
@@ -26,7 +41,7 @@
             "program": "${workspaceFolder}\\bin\\cli.js",
             "args": [
                 "-o",
-                "test/output/CsEtshp",
+                "test/output/cs",
                 "-n",
                 "Api",
                 "-N",
