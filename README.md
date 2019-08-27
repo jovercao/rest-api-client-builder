@@ -1,4 +1,4 @@
-# C# RestApiClient代码生成器
+# RestApi客户端库代码生成器
 
 > 用于生成C#，RestApiClient客户端库的代码生成器
 
