@@ -1,11 +1,16 @@
 /*
 * 本文档由swagger客户端生成工具自动生成
-* 使用wx-promise-pro库
+* 使用wx-promise-pro库，https://github.com/young-js/wx-promise-pro
+* url参数序列化，使用了qs库，https://github.com/ljharb/qs
 * 作者： Jover
 */
 import wxPro from 'wx-promise-pro';
 import qs from 'qs';
 
+/**
+* config 请参考小程序与axios
+* 相较于小程序，多出一个params属性，即querystring的对象，可以自动序列化
+*/
 const http = async function(config) {
     let { url } = config;
 

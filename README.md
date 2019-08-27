@@ -23,56 +23,82 @@ npm install --global rest-api-client-builder
 
 **生成命令：**
 
+命令说明：
+```bat
+restclient [swaggerUrl] [-o outputDir] [-n name] [-N namespace] [-a allowUnauthorized] [-l lang]
+```
+
+**范例：**
+
 ```shell
 # 生成 http://your-host.com/swagger/docs/v1 到目录 d:\rest-client\ 下
 restclient -o "d:\rest-client\" "http://your-host.com/swagger/docs/v1"
 
 ```
 
-您还可以使用以下命令查看命令说明：
+您还可以使用以下命令查看命令帮助：
 
 ```shell
 restclient --help
 ```
 
-## 依赖项说明
+## 支持的生成模式(lang)
 
 生成后的代码是有依赖的，具体依赖请看下文。
 
-### cs
+### cs - c#代码
+
+生成可运行于`.net`及`.net core`的`c#`代码。
+生成代码后依赖以下库运行：
 
 - `RestSharp`
 - `Newtonsoft.Json`
 - `QuerString`
 
-请为使用代码的项目添加以上Nuget依赖。
+请为使用Nuget为代码的项目添加以上依赖包。
 
-### es6
+### es6 - js(es6标准)代码
 
-ES6生成代码后依赖以下库运行：
+生成可运行于web(webpack)/electron/nodejs环境的es6代码。
+
+生成代码后依赖以下库运行：
 
 - axios
+- qs
+
+### mp - 微信小程序代码
+
+生成可运行于微信小程序的es6代码。  
+
+生成代码依赖以下库运行：
+
+- wx-promise-pro
 - qs
 
 ## 配置文件
 
 本工具还支持配置文件，配置路径为当前路径下的 `.restclient.json` 文件，如果没有配置文件  
 你也可以添加用户默认配置文件:`~/.restclient.json`
-具体配置参考如下：  
+具体配置如下：  
+
+| 配置项  |  说明  | 默认值 |
+|---|---|----|
+| swaggerUrl  | swagger的Url，亦可为本地路径  | -  |
+|  namespace | 命名空间，在c#中有效  | RestApiClient  |
+|  name |  客户端名称  |  Api  |
+|  lang | 生成的模式  | 目前支持： es6/mp/cs  |
+|  outputDir | 生成代码的输出路径 |  ./outputs |
+|  allowUnauthorized |  在访问swaggerUrl时，是否不验证https的ssl证书，如果有自生成证书的选项需要添加该配置，否则会生成失败  | false |
+
+**范例：**
 
 ```json
 {
-    // swagger服务器地址
     "swaggerUrl": "http://your-host.com/swagger/docs/v1",
-    // 客户端默认命名空间（完整命名空间），ApiClient类存于此处，默认值: RestApiClient
     "namespace": "RestApiClient",
-    // Client的名称，默认为`api`
     "name": "Api",
-    // 输出的语言，默认为`es6`，目前支持 [ 'es6', 'cs' ]
     "lang": "es6",
-    // 不验证https证书，默认为`false`，用于自生成证书的swagger路径访问
     "allowUnauthorized": false,
-    // 生成的文件输出路径，默认值：outputs
-    "outputDir": "../"
+    "outputDir": "./outputs"
 }
 ```
