@@ -88,7 +88,7 @@ restclient --help
 | swaggerUrl  | swagger的Url，亦可为本地路径  | -  |
 |  namespace | 命名空间，在c#中有效  | RestApiClient  |
 |  name |  客户端名称  |  Api  |
-|  lang | 生成的模式  | 目前支持： es6/mp/cs  |
+|  lang | 生成的模式,目前支持： es6/mp/cs  | es6  |
 |  outputDir | 生成代码的输出路径 |  ./outputs |
 |  allowUnauthorized |  在访问swaggerUrl时，是否不验证https的ssl证书，如果有自生成证书的选项需要添加该配置，否则会生成失败  | false |
 
