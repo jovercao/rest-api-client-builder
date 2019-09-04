@@ -74,7 +74,7 @@ export const [:=groupName:] = {
     * [:=pathParams.map(p => `@param {${$helpers.resolveType(p)}} ${p.name} ${p.format || '-'}，${p.required ? '必填' : ''}，${p.description || ''}`).join('\n    * ') :][:}:]
 [:if(queryParams.length) {:]        * @param {*} $query 查询字符串参数
     *    [:= queryParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n    *    '):]
-[:}:][:if(hasBody) {:]        * @param {*} $body http内容参数
+[:}:][:if(hasBody) {:]    * @param {*} $body http内容参数
     *    [:= bodyParams.map(p=> `${p.name}: ${$helpers.resolveType(p)} ${p.required ? '必填' : ''}，${p.description || ''}`).join('\n    *    '):]
 [:}:]    * @returns {[:= returnType :]} [:= returnInfo.description :]
     */
