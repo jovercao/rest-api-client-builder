@@ -4,7 +4,7 @@
 * url参数序列化，使用了qs库，https://github.com/ljharb/qs
 * 作者： Jover
 */
-import wxPro from 'wx-promise-pro';
+import 'wx-promise-pro';
 import qs from 'qs';
 
 /**
@@ -32,7 +32,7 @@ const http = async function(config) {
         options.url = url;
     }
 
-    return await wxPro.request(options);
+    return await wx.pro.request(options);
 }
 
 http.defaults = {
