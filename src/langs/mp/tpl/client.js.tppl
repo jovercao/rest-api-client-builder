@@ -21,7 +21,7 @@ const http = async function(config) {
 
     if (http.defaults.baseURL && !url.match(/^https?\:\/\//)) {
         let { baseURL } = http.defaults;
-        if (baseURL .endsWith('/')) {
+        if (baseURL.endsWith('/')) {
             baseURL = baseURL.substring(0, baseURL.length - 1);
         }
         if (url.startsWith('/')) {
@@ -37,8 +37,7 @@ const http = async function(config) {
 
 http.defaults = {
     baseURL: '[:=$config.baseUrl || '':]',
-    dataType: 'json',
-    responseType: 'json'
+    dataType: 'json'
 };
 
 [:

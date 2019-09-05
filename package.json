@@ -1,6 +1,6 @@
 {
   "name": "rest-api-client-builder",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "用于生成C#、JS，RestApiClient客户端库的代码生成器",
   "main": "index.js",
   "scripts": {
