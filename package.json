@@ -25,7 +25,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "commander": "^2.20.0",
     "js-tppl": "^1.0.2",
     "mkdirp": "^0.5.1"
